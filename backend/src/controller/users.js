@@ -37,10 +37,10 @@ class ControllerUser {
             res.status(500).send({ error: error.message })
         }
     }
-    Delete(req, res) {
+    async Delete(req, res) {
         const id = req.params.id
         try {
-            ServiceUser.Delete(id)
+            await ServiceUser.Delete(id)
             res.status(204).send()
         } catch (error) {
             res.status(500).send({ error: error.message })

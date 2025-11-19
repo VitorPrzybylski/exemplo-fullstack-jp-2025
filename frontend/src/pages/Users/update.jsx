@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { createUser } from "../../api/users";
+import { updateUser } from "../../api/users";
 import { useNavigate, Link } from "react-router-dom";
 const INITIAL_STATE = {
     nome: '',
@@ -7,7 +7,7 @@ const INITIAL_STATE = {
     senha: '',
     ativo: true
 }
-export default function CreateUser() {
+export default function UpdateUser() {
     const navigate = useNavigate()
     const [user, setUser] = useState(INITIAL_STATE)
     const handleChange = (e) => {
@@ -23,7 +23,7 @@ export default function CreateUser() {
     }
     const handleSave = async (e) => {
         e.preventDefault()
-        const response = await createUser(user)
+        const response = await updateUser(user)
         //validar os dados
         if (response.status === 201) {
             navigate('/users')

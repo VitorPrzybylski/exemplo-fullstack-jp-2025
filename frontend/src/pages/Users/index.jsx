@@ -1,32 +1,25 @@
 import { useEffect, useState } from 'react'
-import { getUsers } from '../../api/users'
+import { deleteUser, getUsers } from '../../api/users'
 import { Link } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 function Users() {
-    const [conteudo, setConteudo] = useState(<>Carregando</>)
+    const [users, setUsers] = useState([])
 
-    async function TranformaEmLista() {
-        const todosUsuarios = await getUsers()
-        console.log(todosUsuarios)
-
-        return todosUsuarios.map(user =>
-            <div className='user' key={user.id}>
-                <label>{user.nome}</label>
-                <label>{user.email}</label>
-
-                <div className='actions'>
-                    <button>Alterar</button>
-                    <button>Deletar</button>
-                </div>
-            </div>
-        )
+    const handleDelete = async (id) => {
+        const response = await deleteUser(id)
+        console.log(id)
+        if (response.status !== 204) {
+            toast("Erro ao deletar, tente mais tarde")
+        }
+        setUsers(users => users.filter(user => user.id !== id))
     }
+
 
     useEffect(() => {
         async function carregar() {
-            setConteudo(
-                await TranformaEmLista()
-            )
+            const allUsers = await getUsers()
+            setUsers(allUsers)
         }
         carregar()
     }, [])
@@ -40,15 +33,40 @@ function Users() {
         <main>
             <div className='user-list'>
                 <Link to={'/create/user'}>
-                
-                <button type='button'>Criar</button>
+
+                    <button type='button'>Criar</button>
+                </Link>
+                <Link to={'/update/user'}>
+
+                    <button type='button'>Alterar</button>
                 </Link>
                 <div className='user header' key='header'>
                     <label>Nome</label>
                     <label>Email</label>
                     <label>Ações</label>
                 </div>
-                {conteudo}
+                {
+                    users.length == 0
+                        ?<div className='user'>
+                        <label>NAO TEM NINGUEM</label>
+                        </div>
+                        :users.map(user =>
+                            <div className='user' key={user.id}>
+                                <label>{user.nome}</label>
+                                <label>{user.email}</label>
+
+                                <div className='actions'>
+                                    <button
+                                      type='button'
+                                        onClick={() => handleUpdate(user.id)}
+                                        >Alterar</button>
+                                    <button
+                                        type='button'
+                                        onClick={() => handleDelete(user.id)}
+                                    >Deletar</button>
+                                </div>
+                            </div>
+                        )}
             </div>
         </main>
     )

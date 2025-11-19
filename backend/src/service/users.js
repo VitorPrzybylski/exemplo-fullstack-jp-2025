@@ -61,7 +61,7 @@ class ServiceUser {
         if (!user) {
             throw new Error("User nao encontrado")
         }
-        user.destroy(id)
+        await user.destroy()
     }
     async Login(email, senha) {
         if (!email || !senha) {

@@ -13,12 +13,12 @@ export const createUser = async (user) => {
     const response = await api.post('/api/v1/user', user)
     return response
 }
-export const updateUser = async (user) => {
+export const updateUser = async (id, user) => {
     const response = await api.put(`/api/v1/users/${id}`, user)
     return response
 
 }
-export const deleteUser = async () => {
-    const response = await api.delete(`/api/v1/users/${id}`)
-
+export const deleteUser = async (id) => {
+    const response = await api.delete(`/api/v1/user/${id}`)
+    return response
 }
