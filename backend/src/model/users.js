@@ -21,11 +21,11 @@ class User {
                 type: database.db.Sequelize.BOOLEAN
             },
             permissao: {
+                // recomendo usar ENUM
                 type: database.db.Sequelize.INTEGER
-
             }
         })
-
     }
 }
+
 export default new User().model

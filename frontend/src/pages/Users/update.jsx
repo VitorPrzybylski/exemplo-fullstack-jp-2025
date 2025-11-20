@@ -1,15 +1,21 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { updateUser } from "../../api/users";
-import { useNavigate, Link } from "react-router-dom";
-const INITIAL_STATE = {
-    nome: '',
-    email: '',
-    senha: '',
-    ativo: true
-}
+import { useLocation, useNavigate } from "react-router-dom";
+import './styles.css'
+import { toast } from "react-toastify";
+
 export default function UpdateUser() {
     const navigate = useNavigate()
-    const [user, setUser] = useState(INITIAL_STATE)
+    const [user, setUser] = useState({
+        nome: '',
+        email: '',
+        senha: '',
+        ativo: true
+    })
+    // adicionar userLocation novo para pegar o state passado anteriormente
+    const location = useLocation()
+    const { user: prevUser } = location.state
+
     const handleChange = (e) => {
         const { id, value } = e.target;
         setUser({
@@ -17,50 +23,58 @@ export default function UpdateUser() {
             [id]: value
         })
     }
+
     const handleReset = (e) => {
         e.preventDefault()
-        setUser(INITIAL_STATE)
+        // alterado do init para o prev
+        setUser({ ...prevUser, senha: '' })
     }
+
     const handleSave = async (e) => {
         e.preventDefault()
-        const response = await updateUser(user)
-        //validar os dados
-        if (response.status === 201) {
+        // Alterada função pra update
+        const response = await updateUser(prevUser.id, user)
+
+        if (response.status === 200) {
             navigate('/users')
+            toast("Usuário alterado com sucesso")
         } else {
+            toast("Erro ao criar Usuário")
             console.log(response)
         }
     }
 
+    // Adicionado
+    useEffect(() => {
+        setUser({ ...prevUser, senha: '' })
+    }, [])
 
     return (
-        <>
-            <main>
-                <form>
-                    <div>
-                        <label>Nome: </label>
-                        <input type="text" name="nome" id="nome" value={user.nome} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Email: </label>
-                        <input type="text" name="email" id="email" value={user.email} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Senha: </label>
-                        <input type="password" name="senha" id="senha" value={user.senha} onChange={handleChange} />
-                    </div>
+        <div className="form">
+            <form>
+                <div>
+                    <label>Nome: </label>
+                    <input type="text" name="nome" id='nome' value={user.nome} onChange={handleChange} />
+                </div>
+                <div>
+                    <label>Email: </label>
+                    <input type="email" name="email" id='email' value={user.email} onChange={handleChange} />
+                </div>
+                <div>
+                    <label>Senha: </label>
+                    <input type="password" name="senha" id='senha' value={user.senha} onChange={handleChange} />
+                </div>
+                <div className="actions">
                     <button
                         type="reset"
                         onClick={handleReset}
-                    >LIMPAR</button>
-                    <button type="submit" onClick={handleSave}>ENVIAR</button>
-                </form>
-            </main>
-            <Link to='/users'>
-                <button>
-                    Navegar para API
-                </button>
-            </Link>
-        </>
+                    >Limpar</button>
+                    <button
+                        type="submit"
+                        onClick={handleSave}
+                    >Enviar</button>
+                </div>
+            </form>
+        </div>
     )
 }

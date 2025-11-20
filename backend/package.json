@@ -1,25 +1,25 @@
 {
-  "name": "crud-jp-2025",
-  "version": "1.0.0",
-  "description": "CRUD backend no curso Jovem Programador",
-  "main": "index.js",
   "type": "module",
+  "name": "exemplos-aula-backend-jp-2025",
+  "version": "1.0.0",
+  "description": "Exemplo de Aula - CRUD",
+  "main": "index.js",
   "scripts": {
     "dev": "node --watch ./src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "cross-env TEST=true node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
-  "author": "",
+  "author": "Renan Ponick",
   "license": "ISC",
-  "devDependencies": {
-    "cross-env": "^10.1.0",
-    "jest": "^30.2.0"
-  },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
-    "express": "^5.1.0",
+    "express": "5.1.0",
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.15.3",
     "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
+    "cross-env": "10.1.0",
+    "jest": "30.2.0"
   }
 }

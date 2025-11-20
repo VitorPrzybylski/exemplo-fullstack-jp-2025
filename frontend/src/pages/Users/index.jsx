@@ -1,20 +1,27 @@
 import { useEffect, useState } from 'react'
 import { deleteUser, getUsers } from '../../api/users'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import './styles.css'
 import { toast } from 'react-toastify'
 
 function Users() {
+    const navigate = useNavigate()
     const [users, setUsers] = useState([])
+
+    const handleUpdate = async (user) => {
+        navigate('/update/user', { state: { user } })
+    }
 
     const handleDelete = async (id) => {
         const response = await deleteUser(id)
-        console.log(id)
+
         if (response.status !== 204) {
-            toast("Erro ao deletar, tente mais tarde")
+            toast("Erro ao deletar, tente novamente, mais tarde")
+            return
         }
+
         setUsers(users => users.filter(user => user.id !== id))
     }
-
 
     useEffect(() => {
         async function carregar() {
@@ -25,21 +32,13 @@ function Users() {
     }, [])
 
     return (
-        // <main>
-        //     <div className='lista-principal'>
-        //         {conteudo}
-        //     </div>
-        // </main>
         <main>
             <div className='user-list'>
-                <Link to={'/create/user'}>
-
-                    <button type='button'>Criar</button>
-                </Link>
-                <Link to={'/update/user'}>
-
-                    <button type='button'>Alterar</button>
-                </Link>
+                <div>
+                    <Link to={'/create/user'}>
+                        <button>Criar</button>
+                    </Link>
+                </div>
                 <div className='user header' key='header'>
                     <label>Nome</label>
                     <label>Email</label>
@@ -47,26 +46,25 @@ function Users() {
                 </div>
                 {
                     users.length == 0
-                        ?<div className='user'>
-                        <label>NAO TEM NINGUEM</label>
+                        ? <div className='user'>
+                            <label>Não tem ngm</label>
                         </div>
-                        :users.map(user =>
+                        : users.map(user =>
                             <div className='user' key={user.id}>
                                 <label>{user.nome}</label>
                                 <label>{user.email}</label>
-
                                 <div className='actions'>
                                     <button
-                                      type='button'
-                                        onClick={() => handleUpdate(user.id)}
-                                        >Alterar</button>
+                                        type='button'
+                                        onClick={() => handleUpdate(user)}
+                                    >Alterar</button>
                                     <button
                                         type='button'
                                         onClick={() => handleDelete(user.id)}
-                                    >Deletar</button>
+                                    >Deleta</button>
                                 </div>
-                            </div>
-                        )}
+                            </div>)
+                }
             </div>
         </main>
     )
