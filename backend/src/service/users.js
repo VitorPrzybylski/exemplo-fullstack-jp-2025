@@ -1,81 +1,84 @@
 import User from '../model/users.js'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
-const SALT = 10
-const JWD_SEGREDO = "a-string-secret-at-least-256-bits-long"
 
+const JWT_SEGREDO = "M3uS3gr3d0"
+const SALT = 10 // 12
 
 class ServiceUser {
+
     async FindAll() {
         return User.findAll()
     }
-    async FindOne(id) {
-        //verificar se o index é valido .lenfh
-        if (!id) {
-            throw new Error("Favor informar ID")
-        }
-        const user = await User.findByPk(id)
-        if (!user) {
-            throw new Error("Usuario nao encontrado, id: " + id)
 
+    async FindOne(id) {
+        if (!id) {
+            throw new Error("Favor informar o ID")
+        }
+
+        // preciso procurar um usuario no banco
+        const user = await User.findByPk(id)
+
+        if (!user) {
+            throw new Error(`Usuário ${id} não encontrado`)
         }
 
         return user
     }
-    async Create(nome, senha, email, ativo, permissao) {
-        if (!nome || !senha || !email) {
-            throw new Error("Favor preencer todods os campos")
 
+    async Create(nome, email, senha, ativo, permissao) {
+        if (!nome || !email || !senha) {
+            throw new Error("favor preencher todos os campos")
         }
-        const senhaCriptografada = await bcrypt.hash(String(senha), SALT)
+
+        const senhaCrip = await bcrypt.hash(String(senha), SALT)
+
         await User.create({
-            nome, senha: senhaCriptografada, email, ativo, permissao
+            nome,
+            email,
+            senha: senhaCrip,
+            ativo,
+            permissao
         })
     }
-    async Update(id, nome, senha, email, ativo) {
-        //verificar se o index e o nome é valido .lenfh
-        if (!id) {
-            throw new Error("Informar ID")
-        }
-        const user = await User.findByPk(id)
-        if (!user) {
-            throw new Error("Usuario nao foi encontrado")
-        }
 
-        user.nome = nome
-        //troca a senha, e quando recebe ela, criptografa, se já estiver criptografada, colocar a mesma
-        user.senha = senha
+    async Update(id, nome, senha) {
+        const oldUser = await User.findByPk(id)
+        // oldUser.nome = nome || oldUser.nome
+
+        oldUser.senha = senha
             ? await bcrypt.hash(String(senha), SALT)
-            : user.senha
+            : oldUser.senha
 
-        user.email = email
-        user.ativo = ativo
-
-        await user.save()
+        // User.Update(id, nome)
     }
+
     async Delete(id) {
-        if (!id) {
-            throw new Error("ID nao encontrado")
-        }
-        const user = await User.findByPk(id)
-        if (!user) {
-            throw new Error("User nao encontrado")
-        }
-        await user.destroy()
+        const oldUser = await User.findByPk(id)
+
+        oldUser.destroy()
     }
+
     async Login(email, senha) {
-        if (!email || !senha) {
-            throw new Error("email ou senha invalidos")
+        if(!email || !senha) {
+            throw new Error("Email ou senha inválidos.")
         }
+
         const user = await User.findOne({ where: { email } })
+
         if (
             !user
             || !(await bcrypt.compare(String(senha), user.senha))
         ) {
-            throw new Error("email ou senha invalidos")
+            throw new Error("Email ou senha inválidos.")
         }
-        return jwt.sign({ id: user.id, nome: user.nome, permissao: user.permissao }, JWD_SEGREDO, { expiresIn: 60 * 60 })
-    }
 
+        return jwt.sign(
+            { id: user.id, nome: user.nome, permissao: user.permissao },
+            JWT_SEGREDO,
+            { expiresIn: 60 * 60 }
+        )
+    }
 }
+
 export default new ServiceUser()
